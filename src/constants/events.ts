@@ -1,4 +1,6 @@
 export const START_GAME = "game:init"
+export const GAME_WAITING = "game:waiting"
+export const JOINED_GAME = "game:joined"
 export const READY_FOR_QUESTION = "question:ready"
 export const SEND_QUESTION = "question:sent"
 export const SUBMIT_ANSWER = "answer:submit"

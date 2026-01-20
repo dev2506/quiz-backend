@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { READY_FOR_QUESTION, START_GAME, SUBMIT_ANSWER } from "src/constants/events";
+import { GAME_WAITING, JOINED_GAME, READY_FOR_QUESTION, START_GAME, SUBMIT_ANSWER } from "src/constants/events";
 import { GameService } from "./game.service";
 
 interface AuthenticatedSocket extends Socket {
@@ -70,7 +70,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {
         try {
             const userId = this.getUserIdFromSocket(client)
-            this.gameService.startGame(userId, client.id)
+            const startGameRes = await this.gameService.startGame(userId, client.id)
+            if (!startGameRes.opponent) {
+                client.emit(GAME_WAITING, {
+                    message: "Waiting for opponent"
+                })
+                return
+            }
+            
+            const user1WsId = this.userIdToSocketId.get(userId)
+            const user2WsId = this.userIdToSocketId.get(startGameRes.opponent)
+            const initialGameData = {}
+            if (user1WsId) {
+                this.wsServer.to(user1WsId).emit(JOINED_GAME, initialGameData)
+            }
+            if (user2WsId) {
+                this.wsServer.to(user2WsId).emit(JOINED_GAME, initialGameData)
+            }
+
         } catch(err) {
 
         }
