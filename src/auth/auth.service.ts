@@ -23,13 +23,14 @@ export class AuthService {
         //TODO: move salt to env
         const user = await this.userService.createUser(registerUserDto)
         const loginUserDto = UserMapper.toLoginUserDto(user)
-        return this.loginUser(loginUserDto)
+        return this.loginUser(loginUserDto, user)
     }
 
     //TODO: type of user?
-    async loginUser(loginUserDto: LoginUserDto) {
+    async loginUser(loginUserDto: LoginUserDto, user: any) {
         const payload = {
             email: loginUserDto.email,
+            id: user.id
         }
         const accessToken = this.jwtService.sign(payload)
         const {password: _, ...result} = loginUserDto

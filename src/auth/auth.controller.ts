@@ -4,6 +4,7 @@ import { RegisterUserDto } from "./dto/register-user.dto";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 import { LoginUserDto } from "./dto/login-user.dto";
+import { CurrentUser } from "./decorators/current-user.decorator";
 
 @Controller()
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
     @Post(LOGIN_URL)
     @UseGuards(LocalAuthGuard)
     @HttpCode(HttpStatus.OK)
-    async loginUser(@Body() loginUserDto: LoginUserDto) {
-        this.authService.loginUser(loginUserDto)
+    async loginUser(@Body() loginUserDto: LoginUserDto, @CurrentUser() user: any) {
+        this.authService.loginUser(loginUserDto, user)
     }
 }
