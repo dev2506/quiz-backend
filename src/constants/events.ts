@@ -1,0 +1,5 @@
+export const START_GAME = "game:init"
+export const READY_FOR_QUESTION = "question:ready"
+export const SEND_QUESTION = "question:sent"
+export const SUBMIT_ANSWER = "answer:submit"
+export const END_GAME = "game:end"
