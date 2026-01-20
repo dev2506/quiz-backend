@@ -5,6 +5,7 @@ import { Model } from "mongoose";
 import * as bcrypt from "bcryptjs"
 import { RegisterUserDto } from "src/auth/dto/register-user.dto";
 import { UserRepository } from "./repositories/user.repository";
+import { env } from "src/config/env";
 
 @Injectable()
 export class UsersService {
@@ -23,7 +24,7 @@ export class UsersService {
     }
 
     async createUser(registerUserDto: RegisterUserDto) {
-        const hashedPassword = await bcrypt.hash(registerUserDto.password, 10)
+        const hashedPassword = await bcrypt.hash(registerUserDto.password, env.SALT)
         return this.userRepository.create({
             email: registerUserDto.email,
             name: registerUserDto.name,

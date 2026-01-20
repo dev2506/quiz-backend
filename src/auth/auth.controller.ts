@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards, ValidationPipe } from "@nestjs/common";
 import { LOGIN_URL, REGISTER_URL } from "src/constants/routes";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import { AuthService } from "./auth.service";
@@ -15,14 +15,14 @@ export class AuthController {
     }
     @Post(REGISTER_URL)
     @HttpCode(HttpStatus.CREATED)
-    async registerUser(@Body() registerUserDto: RegisterUserDto) {
-        this.authService.registerUser(registerUserDto)
+    async registerUser(@Body(ValidationPipe) registerUserDto: RegisterUserDto) {
+        return this.authService.registerUser(registerUserDto)
     }
 
     @Post(LOGIN_URL)
     @UseGuards(LocalAuthGuard)
     @HttpCode(HttpStatus.OK)
-    async loginUser(@Body() loginUserDto: LoginUserDto, @CurrentUser() user: any) {
-        this.authService.loginUser(loginUserDto, user)
+    async loginUser(@Body(ValidationPipe) loginUserDto: LoginUserDto, @CurrentUser() user: any) {
+        return this.authService.loginUser(loginUserDto, user)
     }
 }

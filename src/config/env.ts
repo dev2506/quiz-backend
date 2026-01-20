@@ -4,6 +4,7 @@ type EnvConfig = {
     NODE_ENV: string
     PORT: number
     MONGO_URL: string
+    MONGO_DB_NAME: string
     SALT: number
     JWT_SECRET: string
     JWT_EXPIRY: number
@@ -38,5 +39,6 @@ export const env: EnvConfig = {
     MONGO_URL: getEnv('MONGO_URL'),
     SALT: getNumberEnv('SALT'),
     JWT_SECRET: getEnv('JWT_SECRET'),
-    JWT_EXPIRY: getNumberEnv('JWT_EXPIRY')
+    JWT_EXPIRY: getNumberEnv('JWT_EXPIRY'),
+    MONGO_DB_NAME: getEnv('MONGO_DB_NAME')
 };
