@@ -7,9 +7,11 @@ import { Game, GameSchema } from "./schemas/game.schema";
 import { GameRepository } from "./repositories/game.repository";
 import { JwtModule, JwtService } from "@nestjs/jwt";
 import { env } from "src/config/env";
+import { QuestionsModule } from "src/questions/questions.module";
 
 @Module({
     imports: [
+        QuestionsModule,
         MongooseModule.forFeature([{name: Game.name, schema: GameSchema}]),
         JwtModule.register({
             secret: env.JWT_SECRET,

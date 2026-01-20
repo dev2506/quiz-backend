@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { GAME_WAITING, JOINED_GAME, READY_FOR_QUESTION, START_GAME, SUBMIT_ANSWER } from "src/constants/events";
+import { GAME_WAITING, JOINED_GAME, READY_FOR_QUESTION, SEND_QUESTION, START_GAME, SUBMIT_ANSWER } from "src/constants/events";
 import { GameService } from "./game.service";
 
 interface AuthenticatedSocket extends Socket {
@@ -28,9 +28,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private jwtService: JwtService,
         private gameService: GameService
     ) {
-
     }
-
     async handleConnection(client: AuthenticatedSocket) {
         try {
             const token = client.handshake.headers?.authorization?.split(' ')[1];
@@ -38,13 +36,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 client.disconnect();
                 return;
             }
-            const payload = this.jwtService.verify(token);
+            const payload = this.jwtService.verify(token, {
+                ignoreExpiration: false,
+
+            });
             client.userId = payload.id;
             client.user = payload;
-            this.socketIdToUserId.set(client.id, payload.id)
-            this.userIdToSocketId.set(payload.id, client.id)
+            if (!this.userIdToSocketId.get(payload.id)) {
+                this.socketIdToUserId.set(client.id, payload.id)
+                this.userIdToSocketId.set(payload.id, client.id)
+            }
         } catch (err) {
-
+            client.disconnect()
         }
     }
     async handleDisconnect(client: AuthenticatedSocket) {
@@ -73,23 +76,54 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             const startGameRes = await this.gameService.startGame(userId, client.id)
             if (!startGameRes.opponent) {
                 client.emit(GAME_WAITING, {
-                    message: "Waiting for opponent"
+                    message: "Waiting for opponent",
+                    isError: false
                 })
                 return
             }
             
+            const initialGameData = {
+                gameId: startGameRes.game?.id,
+                totalQuestions: startGameRes.game?.questions,
+                players: startGameRes.game?.players,
+                currentQuestionNumber: 1
+            }
             const user1WsId = this.userIdToSocketId.get(userId)
             const user2WsId = this.userIdToSocketId.get(startGameRes.opponent)
-            const initialGameData = {}
             if (user1WsId) {
                 this.wsServer.to(user1WsId).emit(JOINED_GAME, initialGameData)
             }
             if (user2WsId) {
                 this.wsServer.to(user2WsId).emit(JOINED_GAME, initialGameData)
             }
-
+            const firstQuestion = startGameRes.questions?.[0]
+            if (firstQuestion && user1WsId) {
+                this.wsServer.to(user1WsId).emit(SEND_QUESTION, {
+                    questionIndex: 0,
+                    question: {
+                        id: firstQuestion.id,
+                        text: firstQuestion.text,
+                        choices: firstQuestion.choices,
+                        points: firstQuestion.points,
+                    }
+                })
+            }
+            if (firstQuestion && user2WsId) {
+                this.wsServer.to(user2WsId).emit(SEND_QUESTION, {
+                    questionIndex: 0,
+                    question: {
+                        id: firstQuestion.id,
+                        text: firstQuestion.text,
+                        choices: firstQuestion.choices,
+                        points: firstQuestion.points,
+                    }
+                })
+            }
         } catch(err) {
-
+            client.emit(GAME_WAITING, {
+                message: "Already in waiting queue",
+                isError: false
+            })
         }
     }
     @SubscribeMessage(READY_FOR_QUESTION)

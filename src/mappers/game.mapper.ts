@@ -3,7 +3,7 @@ import { GameDocument } from "src/game/schemas/game.schema";
 
 export class GameMapper {
     public static toDomain(gameDoc: GameDocument): Game {
-        const doc = gameDoc.toObject();
+        const doc = gameDoc.toObject()
         return new Game(
             doc._id.toString(),
             doc.players,
@@ -12,5 +12,8 @@ export class GameMapper {
             doc.playerStates,
             doc.winner as GameWinner | null
         );
+    }
+    public static toDomainOptional(gameDoc: GameDocument | null): Game | null {
+        return gameDoc ? this.toDomain(gameDoc) : null
     }
 }

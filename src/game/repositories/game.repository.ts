@@ -22,4 +22,17 @@ export class GameRepository {
         const newGameCreated = await newGame.save()
         return GameMapper.toDomain(newGameCreated)
     }
+
+    async findByUserIdAndStatus(
+        userId: string,
+        statuses: string[],
+    ): Promise<Game | null> {
+        const gameDoc = await this.gameModel
+            .findOne({
+                players: userId,
+                status: { $in: statuses },
+            })
+            .exec();
+        return GameMapper.toDomainOptional(gameDoc)
+    }
 }

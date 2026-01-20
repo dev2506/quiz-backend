@@ -1,6 +1,6 @@
 export interface PlayerAnswer {
     questionId: string
-    answer: string
+    answer: number
     isCorrect: boolean
     answeredAt: Date
 }

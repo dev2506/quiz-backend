@@ -8,6 +8,7 @@ type EnvConfig = {
     SALT: number
     JWT_SECRET: string
     JWT_EXPIRY: number
+    NO_OF_RANDOM_QUESTIONS: number
 };
 
 dotenv.config({
@@ -40,5 +41,6 @@ export const env: EnvConfig = {
     SALT: getNumberEnv('SALT'),
     JWT_SECRET: getEnv('JWT_SECRET'),
     JWT_EXPIRY: getNumberEnv('JWT_EXPIRY'),
-    MONGO_DB_NAME: getEnv('MONGO_DB_NAME')
+    MONGO_DB_NAME: getEnv('MONGO_DB_NAME'),
+    NO_OF_RANDOM_QUESTIONS: getNumberEnv('NO_OF_RANDOM_QUESTIONS')
 };
