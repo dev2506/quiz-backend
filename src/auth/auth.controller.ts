@@ -1,7 +1,9 @@
-import { Controller, Post } from "@nestjs/common";
-import { LOGIN_URL, REGISTER_URL } from "src/routes/routes";
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { LOGIN_URL, REGISTER_URL } from "src/constants/routes";
 import { RegisterUserDto } from "./dto/register-user.dto";
 import { AuthService } from "./auth.service";
+import { LocalAuthGuard } from "./guards/local-auth.guard";
+import { LoginUserDto } from "./dto/login-user.dto";
 
 @Controller()
 export class AuthController {
@@ -11,12 +13,15 @@ export class AuthController {
 
     }
     @Post(REGISTER_URL)
-    async registerUser(registerUserDto: RegisterUserDto) {
+    @HttpCode(HttpStatus.CREATED)
+    async registerUser(@Body() registerUserDto: RegisterUserDto) {
         this.authService.registerUser(registerUserDto)
     }
 
     @Post(LOGIN_URL)
-    async loginUser() {
-
+    @UseGuards(LocalAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    async loginUser(@Body() loginUserDto: LoginUserDto) {
+        this.authService.loginUser(loginUserDto)
     }
 }
