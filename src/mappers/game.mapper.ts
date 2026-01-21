@@ -6,7 +6,7 @@ export class GameMapper {
         const doc = gameDoc.toObject()
         return new Game(
             doc._id.toString(),
-            doc.players,
+            doc.players.map(p => p.toString()),
             doc.questions,
             doc.status as 'waiting' | 'active' | 'completed',
             doc.playerStates,
