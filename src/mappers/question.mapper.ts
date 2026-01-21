@@ -11,6 +11,9 @@ export class QuestionMapper {
             doc.points
         );
     }
+    public static toDomainOptional(doc: QuestionDocument | null): Question | null {
+        return doc ? this.toDomain(doc) : null
+    }
     public static toDomainArray(questionDocs: QuestionDocument[]): Question[] {
         return questionDocs.map((doc) => this.toDomain(doc))
     }

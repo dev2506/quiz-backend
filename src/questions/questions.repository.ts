@@ -17,4 +17,9 @@ export class QuestionsRepository {
             .exec();
         return QuestionMapper.toDomainArray(questionDocs)
     }
+
+    async getQuestionById(id: string): Promise<Question | null> {
+        const questionDoc = await this.questionModel.findById(id).exec()
+        return QuestionMapper.toDomainOptional(questionDoc);
+    }
 }

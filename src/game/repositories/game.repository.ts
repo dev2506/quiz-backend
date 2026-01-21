@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Game as GameSchema, GameDocument } from "../schemas/game.schema";
 import { Model } from "mongoose";
@@ -23,6 +23,23 @@ export class GameRepository {
         return GameMapper.toDomain(newGameCreated)
     }
 
+    async save(game: Game) {
+        const gameDoc = await this.gameModel
+        .findByIdAndUpdate(
+          game.id,
+          {
+            status: game.status,
+            playerStates: game.playerStates,
+            winner: game.winner,
+          },
+          { new: true },
+        ).exec();
+        if (!gameDoc) {
+            throw new NotFoundException('Game not found')
+        }
+        return GameMapper.toDomain(gameDoc)
+    }
+
     async findByUserIdAndStatus(
         userId: string,
         statuses: string[],
@@ -33,6 +50,11 @@ export class GameRepository {
                 status: { $in: statuses },
             })
             .exec();
+        return GameMapper.toDomainOptional(gameDoc)
+    }
+
+    async findById(gameId: string) {
+        const gameDoc = await this.gameModel.findById(gameId).exec();
         return GameMapper.toDomainOptional(gameDoc)
     }
 }
