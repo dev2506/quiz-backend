@@ -18,7 +18,6 @@ export class UserRepository {
     ) {
         
     }
-    // TODO: Error handling and global exception filter with proper response
     async create(userData: CreateUserData): Promise<User> {
         const newUser = new this.userModel(userData)
         const createdUser = await newUser.save().catch(err => {

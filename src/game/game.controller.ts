@@ -12,7 +12,6 @@ export class GameController {
     @UseGuards(JwtAuthGuard)
     @HttpCode(HttpStatus.OK)
     async startGame(@CurrentUser() user: any) {
-        // TODO: if in active game, handle
         return {
             message: "Ready!"
         }
