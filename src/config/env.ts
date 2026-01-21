@@ -9,6 +9,7 @@ type EnvConfig = {
     JWT_SECRET: string
     JWT_EXPIRY: number
     NO_OF_RANDOM_QUESTIONS: number
+    REDIS_URL: string
 };
 
 dotenv.config({
@@ -42,5 +43,6 @@ export const env: EnvConfig = {
     JWT_SECRET: getEnv('JWT_SECRET'),
     JWT_EXPIRY: getNumberEnv('JWT_EXPIRY'),
     MONGO_DB_NAME: getEnv('MONGO_DB_NAME'),
-    NO_OF_RANDOM_QUESTIONS: getNumberEnv('NO_OF_RANDOM_QUESTIONS')
+    NO_OF_RANDOM_QUESTIONS: getNumberEnv('NO_OF_RANDOM_QUESTIONS'),
+    REDIS_URL: getEnv('REDIS_URL')
 };
