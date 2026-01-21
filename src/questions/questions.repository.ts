@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { QuestionDocument, Question as QuestionSchema } from "./schemas/question.schema";
 import { Model } from "mongoose";
-import { Question } from "./models/question.model";
+import { Question, QuestionWithoutId } from "./models/question.model";
 import { QuestionMapper } from "src/mappers/question.mapper";
 
 @Injectable()
@@ -21,5 +21,9 @@ export class QuestionsRepository {
     async getQuestionById(id: string): Promise<Question | null> {
         const questionDoc = await this.questionModel.findById(id).exec()
         return QuestionMapper.toDomainOptional(questionDoc);
+    }
+
+    async bulkAdd(questions: QuestionWithoutId[]) {
+        return this.questionModel.insertMany(questions)
     }
 }

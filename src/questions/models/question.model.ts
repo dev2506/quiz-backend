@@ -8,3 +8,12 @@ export class Question {
     ) { }
 }
 
+export class QuestionWithoutId {
+    constructor(
+        public text: string,
+        public choices: string[],
+        public correctAnsIndex: number,
+        public points: number,
+    ) { }
+}
+
