@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:80"      # External:Internal
     env_file:
-      - .env
+      - .env.prod
     depends_on:
       - mongodb
       - redis
